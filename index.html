@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TilePro Manager Demo</title>
+<style>
+:root{--blue:#075aa8;--blue2:#0d76d5;--bg:#f4f7fb;--text:#17324d;--muted:#6d7f90;--line:#e4ebf2;--green:#20a66a;--orange:#f2a93b;--red:#e15b5b}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{display:flex;min-height:100vh}.sidebar{width:240px;background:#fff;border-right:1px solid var(--line);padding:24px 16px;position:fixed;left:0;top:0;bottom:0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--blue);padding:4px 10px 28px}.logo-icon{width:38px;height:38px;background:linear-gradient(135deg,#0d76d5,#074a8d);border-radius:10px;display:grid;place-items:center;color:#fff;font-size:20px}
+.nav button{width:100%;border:0;background:none;text-align:left;padding:12px 14px;margin:3px 0;border-radius:10px;color:#607487;font-size:14px;cursor:pointer}.nav button.active,.nav button:hover{background:#eaf4ff;color:var(--blue);font-weight:700}
+.user{position:absolute;bottom:20px;left:16px;right:16px;border-top:1px solid var(--line);padding:16px 8px;display:flex;gap:10px;align-items:center}.avatar{width:36px;height:36px;border-radius:50%;background:#dceeff;color:var(--blue);display:grid;place-items:center;font-weight:700}
+.main{margin-left:240px;flex:1}.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;position:sticky;top:0;z-index:2}.top h1{font-size:20px;margin:0}.bell{font-size:20px}.content{padding:30px;max-width:1250px;margin:auto}
+h2{font-size:25px;margin:0 0 6px}.sub{color:var(--muted);margin:0 0 24px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(18,49,80,.04)}.stat .label{color:var(--muted);font-size:13px}.stat .num{font-size:27px;font-weight:800;margin-top:8px}.icon{float:right;background:#eaf4ff;color:var(--blue);padding:9px;border-radius:10px}
+.section{margin-top:24px}.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section-title h3{margin:0;font-size:17px}.btn{border:0;background:var(--blue2);color:white;border-radius:9px;padding:10px 14px;cursor:pointer;font-weight:600}.btn.secondary{background:#edf5fc;color:var(--blue)}
+.projects{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.project{cursor:pointer}.project:hover{transform:translateY(-2px);transition:.15s}.photo{height:115px;border-radius:10px;background:linear-gradient(135deg,#c9d8e5,#edf3f7);display:grid;place-items:center;font-size:42px;margin-bottom:14px}.project h4{margin:0 0 6px;font-size:16px}.meta{font-size:13px;color:var(--muted)}.bar{height:7px;background:#e7eef5;border-radius:8px;margin-top:13px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--blue2),#31b77b);border-radius:8px}
+.page{display:none}.page.active{display:block}.back{background:none;border:0;color:var(--blue);padding:0 0 15px;cursor:pointer;font-weight:700}
+.list{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}.row{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}.row:last-child{border-bottom:0}.status{padding:5px 9px;border-radius:20px;font-size:11px;font-weight:700}.done{background:#e3f7ee;color:#148353}.progress{background:#fff2d9;color:#a96a00}.pending{background:#edf1f5;color:#667789}.open{background:#ffe5e5;color:#b53b3b}
+.two{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.detail-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}.detail-title h2{margin:0}.tag{display:inline-block;background:#eaf4ff;color:var(--blue);padding:5px 9px;border-radius:15px;font-size:12px;margin-top:7px}
+.kpi{font-size:24px;font-weight:800}.small{font-size:12px;color:var(--muted)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);font-weight:600}
+footer{color:#8a99a8;text-align:center;padding:35px;font-size:12px}
+@media(max-width:850px){.sidebar{width:70px}.logo span,.nav button span,.user div:not(.avatar){display:none}.main{margin-left:70px}.grid,.projects,.three,.two{grid-template-columns:1fr}.content{padding:18px}.top{padding:0 18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo"><div class="logo-icon">⌂</div><span>TilePro Manager</span></div>
+  <nav class="nav">
+    <button class="active" onclick="show('dashboard',this)">▦ <span>Dashboard</span></button>
+    <button onclick="show('projects',this)">▣ <span>Projects</span></button>
+    <button onclick="show('tasks',this)">✓ <span>Tasks</span></button>
+    <button onclick="show('materials',this)">▤ <span>Materials</span></button>
+    <button onclick="show('issues',this)">⚠ <span>Quality Issues</span></button>
+    <button onclick="show('reports',this)">▥ <span>Reports</span></button>
+  </nav>
+  <div class="user"><div class="avatar">VP</div><div><b style="font-size:13px">Vishal Prajapati</b><div class="small">Project Manager</div></div></div>
+</aside>
+
+<main class="main">
+<header class="top"><h1 id="pageTitle">Dashboard</h1><div class="bell">🔔</div></header>
+<div class="content">
+
+<section id="dashboard" class="page active">
+  <h2>Good morning, Vishal</h2><p class="sub">Here is your project overview.</p>
+  <div class="grid">
+    <div class="card stat"><div class="icon">▣</div><div class="label">Active Projects</div><div class="num">3</div></div>
+    <div class="card stat"><div class="icon">✓</div><div class="label">Overall Progress</div><div class="num">42%</div></div>
+    <div class="card stat"><div class="icon">👥</div><div class="label">Workers On Site</div><div class="num">12</div></div>
+    <div class="card stat"><div class="icon">▤</div><div class="label">Material Alerts</div><div class="num">5</div></div>
+  </div>
+  <div class="section">
+    <div class="section-title"><h3>Active Projects</h3><button class="btn secondary" onclick="show('projects')">View All</button></div>
+    <div class="projects">
+      <div class="card project" onclick="show('project')"><div class="photo">🏢</div><h4>Riverside Apartments</h4><div class="meta">8 floors · 64 units</div><div class="bar"><div class="fill" style="width:68%"></div></div><div class="small" style="margin-top:6px">68% complete</div></div>
+      <div class="card project" onclick="show('project')"><div class="photo">🏠</div><h4>Maple Residence</h4><div class="meta">6 floors · 48 units</div><div class="bar"><div class="fill" style="width:42%"></div></div><div class="small" style="margin-top:6px">42% complete</div></div>
+      <div class="card project" onclick="show('project')"><div class="photo">🏬</div><h4>Oak Tower</h4><div class="meta">10 floors · 80 units</div><div class="bar"><div class="fill" style="width:25%"></div></div><div class="small" style="margin-top:6px">25% complete</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="projects" class="page">
+<h2>Projects</h2><p class="sub">Manage active construction projects and track progress.</p>
+<div class="projects">
+<div class="card project" onclick="show('project')"><div class="photo">🏢</div><h4>Riverside Apartments</h4><div class="meta">8 floors · 64 units</div><div class="bar"><div class="fill" style="width:68%"></div></div></div>
+<div class="card project" onclick="show('project')"><div class="photo">🏠</div><h4>Maple Residence</h4><div class="meta">6 floors · 48 units</div><div class="bar"><div class="fill" style="width:42%"></div></div></div>
+<div class="card project" onclick="show('project')"><div class="photo">🏬</div><h4>Oak Tower</h4><div class="meta">10 floors · 80 units</div><div class="bar"><div class="fill" style="width:25%"></div></div></div>
+</div></section>
+
+<section id="project" class="page">
+<button class="back" onclick="show('projects')">← Back to Projects</button>
+<div class="detail-head"><div class="detail-title"><h2>Riverside Apartments</h2><span class="tag">Active Project</span></div><button class="btn">+ Add Update</button></div>
+<div class="grid">
+<div class="card stat"><div class="label">Floors</div><div class="kpi">8</div></div>
+<div class="card stat"><div class="label">Units</div><div class="kpi">64</div></div>
+<div class="card stat"><div class="label">Progress</div><div class="kpi">68%</div></div>
+<div class="card stat"><div class="label">Workers</div><div class="kpi">8</div></div>
+</div>
+<div class="section two">
+<div class="card"><div class="section-title"><h3>Floors & Apartments</h3><button class="btn secondary" onclick="show('tasks')">View Tasks</button></div>
+<table><tr><th>Floor</th><th>Units</th><th>Progress</th><th>Status</th></tr>
+<tr><td>Floor 1</td><td>8</td><td>75%</td><td><span class="status done">On Track</span></td></tr>
+<tr><td>Floor 2</td><td>8</td><td>62%</td><td><span class="status done">On Track</span></td></tr>
+<tr><td>Floor 3</td><td>8</td><td>50%</td><td><span class="status progress">In Progress</span></td></tr>
+<tr><td>Floor 4</td><td>8</td><td>38%</td><td><span class="status progress">In Progress</span></td></tr>
+<tr><td>Floor 5</td><td>8</td><td>25%</td><td><span class="status pending">Pending</span></td></tr>
+</table></div>
+<div class="card"><h3>Project Modules</h3><div class="row">👥 Workers & Tasks <b>›</b></div><div class="row">▤ Materials <b>›</b></div><div class="row">📷 Daily Progress <b>›</b></div><div class="row">⚠ Quality Issues <b>›</b></div><div class="row">▥ Reports <b>›</b></div></div>
+</div>
+</section>
+
+<section id="tasks" class="page">
+<h2>Tasks & Worker Assignments</h2><p class="sub">Track daily work and assigned crews.</p>
+<div class="list">
+<div class="row"><div><b>Floor Tile — Apartment 302</b><div class="small">Crew 4 · Riverside Apartments</div></div><span class="status progress">In Progress</span></div>
+<div class="row"><div><b>Bathroom Tile — Apartment 305</b><div class="small">Crew 2 · Riverside Apartments</div></div><span class="status done">Complete</span></div>
+<div class="row"><div><b>Granite Countertops — Floor 2</b><div class="small">Crew 3 · Riverside Apartments</div></div><span class="status pending">Pending</span></div>
+<div class="row"><div><b>Kitchen Tile — Apartment 205</b><div class="small">Crew 1 · Maple Residence</div></div><span class="status done">Complete</span></div>
+</div></section>
+
+<section id="materials" class="page">
+<h2>Materials</h2><p class="sub">Monitor received, used, and remaining materials.</p>
+<div class="three">
+<div class="card"><h3>Ceramic Tile</h3><div class="small">Received: 500 sq ft</div><div class="kpi">450 <span class="small">sq ft left</span></div><div class="bar"><div class="fill" style="width:90%"></div></div></div>
+<div class="card"><h3>Granite Slabs</h3><div class="small">Received: 20 slabs</div><div class="kpi">15 <span class="small">slabs left</span></div><div class="bar"><div class="fill" style="width:75%"></div></div></div>
+<div class="card"><h3>Tile Adhesive</h3><div class="small">Received: 50 bags</div><div class="kpi">35 <span class="small">bags left</span></div><div class="bar"><div class="fill" style="width:70%"></div></div></div>
+</div></section>
+
+<section id="issues" class="page">
+<h2>Quality & Issues</h2><p class="sub">Track construction problems until they are resolved.</p>
+<div class="list">
+<div class="row"><div><b>Broken tile</b><div class="small">Apartment 304 · Floor 3 · Oct 1</div></div><span class="status open">Open</span></div>
+<div class="row"><div><b>Incorrect installation</b><div class="small">Apartment 205 · Floor 2 · Sep 30</div></div><span class="status progress">In Progress</span></div>
+<div class="row"><div><b>Granite scratch</b><div class="small">Apartment 102 · Floor 1 · Sep 28</div></div><span class="status done">Resolved</span></div>
+</div></section>
+
+<section id="reports" class="page">
+<h2>Project Reports</h2><p class="sub">Quick reports for management and customers.</p>
+<div class="three">
+<div class="card"><h3>Project Summary</h3><p class="small">Overall progress, units, and open issues.</p><button class="btn secondary" onclick="alert('Demo: Project Summary report generated.')">Generate</button></div>
+<div class="card"><h3>Material Report</h3><p class="small">Received, used, and remaining materials.</p><button class="btn secondary" onclick="alert('Demo: Material report generated.')">Generate</button></div>
+<div class="card"><h3>Worker Report</h3><p class="small">Assignments and daily work progress.</p><button class="btn secondary" onclick="alert('Demo: Worker report generated.')">Generate</button></div>
+</div></section>
+
+<footer>TilePro Manager · Construction Project Management Demo</footer>
+</div></main></div>
+<script>
+const titles={dashboard:'Dashboard',projects:'Projects',project:'Project Details',tasks:'Tasks & Workers',materials:'Materials',issues:'Quality Issues',reports:'Reports'};
+function show(id,btn){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+ const el=document.getElementById(id); if(el) el.classList.add('active');
+ document.getElementById('pageTitle').textContent=titles[id]||'TilePro Manager';
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+ if(btn) btn.classList.add('active');
+ else {const map={dashboard:0,projects:1,tasks:2,materials:3,issues:4,reports:5}; const b=document.querySelectorAll('.nav button')[map[id]]; if(b)b.classList.add('active');}
+ window.scrollTo(0,0);
+}
+</script>
+</body></html>
